@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartGate | Approval Dashboard</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --sg-primary: #2563eb;
+            --sg-primary-dark: #1d4ed8;
+            --sg-accent: #0ea5e9;
+            --sg-dark: #0f172a;
+            --sg-muted: #64748b;
+            --sg-surface: #f8fafc;
+            --sg-card: #ffffff;
+            --sg-border: #e2e8f0;
+            --sg-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+            --sg-radius: 16px;
+            --sg-success: #059669;
+            --sg-danger: #dc2626;
+            --sg-warning: #d97706;
+        }
+
+        body {
+            font-family: "DM Sans", system-ui, sans-serif;
+            background: linear-gradient(180deg, #eef4ff 0%, var(--sg-surface) 40%, #fff 100%);
+            color: var(--sg-dark);
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--sg-border);
+            padding: 0.85rem 0;
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--sg-dark);
+            text-decoration: none;
+        }
+
+        .brand span { color: var(--sg-primary); }
+
+        .page-header {
+            margin-top: 1.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.35rem;
+        }
+
+        .page-subtitle {
+            color: var(--sg-muted);
+            margin-bottom: 0;
+        }
+
+        /* Role & visibility bar */
+        .control-bar {
+            background: var(--sg-card);
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+        }
+
+        .role-badge.hod {
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--sg-primary-dark);
+        }
+
+        .role-badge.warden {
+            background: rgba(217, 119, 6, 0.12);
+            color: #b45309;
+        }
+
+        .visibility-note {
+            font-size: 0.875rem;
+            color: var(--sg-muted);
+            padding: 0.65rem 0.9rem;
+            background: var(--sg-surface);
+            border-radius: 10px;
+            border-left: 3px solid var(--sg-primary);
+        }
+
+        .role-select {
+            max-width: 200px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Request cards */
+        .request-card {
+            background: var(--sg-card);
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .request-card:hover {
+            box-shadow: var(--sg-shadow);
+        }
+
+        .request-card.rejected {
+            opacity: 0.65;
+            border-color: #fecaca;
+            background: #fffafa;
+        }
+
+        .request-card.approved {
+            border-color: #a7f3d0;
+            background: #f0fdf4;
+        }
+
+        .card-header-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid var(--sg-border);
+        }
+
+        .student-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.15rem;
+        }
+
+        .mode-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.3rem 0.65rem;
+            border-radius: 999px;
+        }
+
+        .mode-tag.working {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--sg-primary-dark);
+        }
+
+        .mode-tag.holiday {
+            background: rgba(217, 119, 6, 0.1);
+            color: #b45309;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.85rem 1.25rem;
+            margin-bottom: 1.15rem;
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--sg-muted);
+            margin-bottom: 0.15rem;
+        }
+
+        .detail-item span {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .reason-block {
+            background: var(--sg-surface);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.15rem;
+        }
+
+        .reason-block label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--sg-muted);
+        }
+
+        .reason-block p {
+            margin: 0.35rem 0 0;
+            font-size: 0.925rem;
+            line-height: 1.6;
+        }
+
+        /* Parent accepted alert */
+        .parents-accepted-alert {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--sg-success);
+            border: 1px solid rgba(5, 150, 105, 0.25);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .parents-accepted-alert.show {
+            display: flex;
+        }
+
+        .parents-accepted-alert .icon {
+            font-size: 1.1rem;
+        }
+
+        /* Action button groups */
+        .action-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .action-group.hidden { display: none; }
+
+        .btn-stage1-parents {
+            background: var(--sg-primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.55rem 1.15rem;
+        }
+
+        .btn-stage1-parents:hover {
+            background: var(--sg-primary-dark);
+            color: #fff;
+        }
+
+        .btn-stage1-reject {
+            background: #fff;
+            color: var(--sg-danger);
+            border: 1.5px solid var(--sg-danger);
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.55rem 1.15rem;
+        }
+
+        .btn-stage1-reject:hover {
+            background: var(--sg-danger);
+            color: #fff;
+        }
+
+        .btn-stage2-accept {
+            background: var(--sg-success);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.55rem 1.15rem;
+        }
+
+        .btn-stage2-accept:hover {
+            background: #047857;
+            color: #fff;
+        }
+
+        .btn-stage2-reject {
+            background: #fff;
+            color: var(--sg-danger);
+            border: 1.5px solid var(--sg-border);
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.55rem 1.15rem;
+        }
+
+        .btn-stage2-reject:hover {
+            border-color: var(--sg-danger);
+            color: var(--sg-danger);
+        }
+
+        .btn-simulate-parent {
+            background: transparent;
+            color: var(--sg-muted);
+            border: 1px dashed var(--sg-border);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 0.85rem;
+        }
+
+        .btn-simulate-parent:hover {
+            border-color: var(--sg-success);
+            color: var(--sg-success);
+        }
+
+        .stage-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--sg-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background: var(--sg-card);
+            border: 1px dashed var(--sg-border);
+            border-radius: var(--sg-radius);
+            color: var(--sg-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--sg-dark);
+            margin-bottom: 0.35rem;
+        }
+
+        .status-pill {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+        }
+
+        .status-pill.pending { background: #fef3c7; color: #92400e; }
+        .status-pill.mail-sent { background: #dbeafe; color: #1e40af; }
+        .status-pill.done { background: #d1fae5; color: #065f46; }
+    </style>
+</head>
+<body>
+
+<header class="top-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="brand" href="index.html">Smart<span>Gate</span></a>
+        <span class="text-muted small fw-semibold">Approval Dashboard</span>
+    </div>
+</header>
+
+<main class="container pb-5">
+
+    <div class="page-header">
+        <h1 class="page-title">Leave Request Approvals</h1>
+        <p class="page-subtitle">Review and action pending student leave requests based on your role.</p>
+    </div>
+
+    <!-- Role & visibility controls -->
+    <section class="control-bar">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <label for="roleSelect" class="form-label fw-semibold small text-muted mb-1">Logged-in Role</label>
+                <div class="role-badge" id="loggedInRole">
+                    Loading...
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span>Viewing as:</span>
+                    <span id="roleBadge" class="role-badge hod">HOD</span>
+                </div>
+                <div id="visibilityNote" class="visibility-note">
+                    Showing working-day requests requiring HOD approval. Warden handles holidays separately.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Request list -->
+    <section id="requestList"></section>
+
+    <div id="emptyState" class="empty-state d-none">
+        <h3>No pending requests</h3>
+        <p class="mb-0">There are no leave requests matching your role and attendance visibility rules.</p>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+<script>
+    /**
+     * SmartGate Approval Dashboard Controller
+     * Handles role-based visibility, two-stage approval actions, and parent response state.
+     */
+    (function () {
+        'use strict';
+
+        const STATUS = {
+            PENDING: 'PENDING',
+            APPROVED: 'APPROVED',
+            REJECTED: 'REJECTED',
+            MAIL_SENT: 'MAIL_SENT'
+        };
+
+        // --- Mock pending requests (wire to GET /api/leaves API later) ---
+        let requests = [
+            {
+                id: 1,
+                studentName: 'Rahul Sharma',
+                regNo: 'CS21B1001',
+                department: 'Computer Science',
+                outingType: 'Home Outing',
+                reason: 'Family function at native place.',
+                startDate: '2026-08-15',
+                endDate: '2026-08-17',
+                isWorkingDay: true,
+                parentStatus: STATUS.PENDING,
+                hodStatus: STATUS.PENDING,
+                wardenStatus: STATUS.PENDING,
+                overallStatus: STATUS.PENDING,
+                mailSent: false
+            },
+        ];
+        const currentRole = (localStorage.getItem('userRole') || 'HOD').toUpperCase();
+
+const pendingLeavesUrl = currentRole === 'HOD'
+    ? '/api/leave-requests/pending/hod'
+    : '/api/leave-requests/pending/warden';
+    fetch('/api/leaves')
+    .then(function(response) {
+        if (!response.ok) {
+            throw new Error('Failed to load leave requests');
+        }
+        return response.json();
+    })
+    .then(function(data) {
+
+        if (data && data.length > 0) {
+
+            requests = data.map(function(req) {
+
+                return {
+                    id: req.id,
+
+                    studentName: req.user?.name || 'Student Name',
+
+                    regNo: req.user?.roleNumber || 'N/A',
+
+                    department: req.user?.department || 'Department',
+
+                    outingType: req.outingType || 'Home Outing',
+
+                    reason: req.reason || 'No reason',
+
+                    startDate: req.startDate,
+
+                    endDate: req.endDate,
+
+                    isWorkingDay: req.isWorkingDay ?? true,
+                    
+
+                    parentStatus: req.parentStatus || 'PENDING',
+
+                    hodStatus: req.hodStatus || 'PENDING',
+
+                    wardenStatus: req.wardenStatus || 'PENDING',
+
+                    overallStatus: req.overallStatus || 'PENDING'
+                };
+            });
+
+            renderRequests();
+
+        } else {
+
+            requests = [];
+            renderRequests();
+        }
+    })
+    .catch(function(error) {
+        console.error('Error loading leave requests:', error);
+
+        requests = [];
+        renderRequests();
+    });
+    
+    const roleBadge = document.getElementById('roleBadge');
+const loggedInRole = document.getElementById('loggedInRole');
+const visibilityNote = document.getElementById('visibilityNote');
+const requestList = document.getElementById('requestList');
+const emptyState = document.getElementById('emptyState');
+
+roleBadge.textContent = currentRole;
+roleBadge.className = 'role-badge ' +
+    (currentRole === 'HOD' ? 'hod' : 'warden');
+
+loggedInRole.textContent = currentRole;
+loggedInRole.className = 'role-badge ' +
+    (currentRole === 'HOD' ? 'hod' : 'warden');
+    function isVisibleToRole(request, role) {
+
+// Overall rejected ayithe HOD + Warden ki hide
+if (request.overallStatus === STATUS.REJECTED) {
+    return false;
+}
+
+// Working Day → HOD + Warden
+if (request.isWorkingDay) {
+
+    if (role === 'HOD') {
+        return request.hodStatus !== STATUS.APPROVED &&
+               request.hodStatus !== STATUS.REJECTED;
+    }
+
+    if (role === 'WARDEN') {
+        return request.wardenStatus !== STATUS.APPROVED &&
+               request.wardenStatus !== STATUS.REJECTED;
+    }
+}
+
+// Holiday → Warden only
+if (!request.isWorkingDay && role === 'WARDEN') {
+    return request.wardenStatus !== STATUS.APPROVED &&
+           request.wardenStatus !== STATUS.REJECTED;
+}
+
+return false;
+}
+
+
+        function getVisibilityNote(role) {
+            if (role === 'HOD') {
+                return 'Showing <strong>Working Day</strong> requests only. HOD approval is required alongside Warden. Holiday requests are routed to Warden only.';
+            }
+            return 'Showing <strong>Holiday</strong> requests (Warden-only route) and <strong>Working Day</strong> requests where parents have accepted and HOD has approved.';
+        }
+
+        function isParentsAccepted(request) {
+            return request.parentStatus === STATUS.APPROVED;
+        }
+
+        function canShowStage1(request) {
+
+if (request.overallStatus === STATUS.REJECTED ||
+    request.overallStatus === STATUS.APPROVED) {
+    return false;
+}
+
+if (isParentsAccepted(request)) {
+    return false;
+}
+
+if (request.isWorkingDay) {
+    return currentRole === 'HOD' || currentRole === 'WARDEN';
+}
+
+return currentRole === 'WARDEN';
+}
+function canShowStage2(request) {
+
+if (!isParentsAccepted(request)) {
+    return false;
+}
+
+if (request.overallStatus === STATUS.REJECTED) {
+    return false;
+}
+
+// HOD → HOD status pending unte matrame buttons
+if (currentRole === 'HOD') {
+    return request.hodStatus === STATUS.PENDING;
+}
+
+// Warden → Warden status pending unte matrame buttons
+if (currentRole === 'WARDEN') {
+    return request.wardenStatus === STATUS.PENDING;
+}
+
+return false;
+}
+        // --- Render ---
+        function renderRequests() {
+            const visible = requests.filter(function (r) {
+                return isVisibleToRole(r, currentRole);
+            });
+
+            requestList.innerHTML = '';
+            emptyState.classList.toggle('d-none', visible.length > 0);
+
+            visible.forEach(function (request) {
+                requestList.appendChild(buildRequestCard(request));
+            });
+        }
+
+        function buildRequestCard(request) {
+            const card = document.createElement('article');
+            card.className = 'request-card';
+            card.dataset.id = request.id;
+
+            if (request.overallStatus === STATUS.REJECTED) card.classList.add('rejected');
+            if (request.overallStatus === STATUS.APPROVED) card.classList.add('approved');
+
+            const modeClass = request.isWorkingDay ? 'working' : 'holiday';
+            const modeLabel = request.isWorkingDay ? 'Working Day' : 'Holiday';
+            const statusLabel = request.mailSent && !isParentsAccepted(request) ? 'mail-sent' : 'pending';
+            const statusText = request.mailSent && !isParentsAccepted(request) ? 'Awaiting Parent' : 'Pending';
+
+            card.innerHTML =
+                '<div class="card-header-row">' +
+                    '<div>' +
+                        '<div class="student-name">' + escapeHtml(request.studentName) + '</div>' +
+                        '<small class="text-muted">' + escapeHtml(request.regNo) + '</small>' +
+                    '</div>' +
+                    '<div class="d-flex gap-2 align-items-center">' +
+                        '<span class="mode-tag ' + modeClass + '">' + modeLabel + '</span>' +
+                        '<span class="status-pill ' + statusLabel + '">' + statusText + '</span>' +
+                    '</div>' +
+                '</div>' +
+
+                '<div class="detail-grid">' +
+                    detailCell('Registration No', request.regNo) +
+                    detailCell('Department', request.department) +
+                    detailCell('Outing Type', request.outingType) +
+                    detailCell('Start Date', request.startDate) +
+                    detailCell('End Date', request.endDate) +
+                '</div>' +
+
+                '<div class="reason-block">' +
+                    '<label>Reason</label>' +
+                    '<p>' + escapeHtml(request.reason) + '</p>' +
+                '</div>' +
+
+                '<div class="parents-accepted-alert' + (isParentsAccepted(request) ? ' show' : '') + '" data-parents-alert>' +
+                    '<span class="icon">&#10003;</span> Parents Accepted' +
+                '</div>' +
+
+                '<div class="stage-label">Stage 1 — Parent Notification</div>' +
+                '<div class="action-group' + (canShowStage1(request) ? '' : ' hidden') + '" data-stage1>' +
+                    '<button type="button" class="btn btn-stage1-parents" data-action="send-parents">Send to Parents</button>' +
+                    '<button type="button" class="btn btn-stage1-reject" data-action="stage1-reject">Rejected</button>' +
+                    (request.mailSent ? '<button type="button" class="btn btn-simulate-parent" data-action="simulate-parent">Simulate Parent Approve (demo)</button>' : '') +
+                '</div>' +
+
+                '<div class="stage-label mt-3">Stage 2 — ' + currentRole + ' Decision</div>' +
+                '<div class="action-group' + (canShowStage2(request) ? '' : ' hidden') + '" data-stage2>' +
+                    '<button type="button" class="btn btn-stage2-accept" data-action="final-accept">Accept</button>' +
+                    '<button type="button" class="btn btn-stage2-reject" data-action="final-reject">Reject</button>' +
+                '</div>';
+
+            bindCardEvents(card, request);
+            return card;
+        }
+
+        function detailCell(label, value) {
+            return '<div class="detail-item"><label>' + label + '</label><span>' + escapeHtml(value) + '</span></div>';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function findRequest(id) {
+            return requests.find(function (r) { return r.id === id; });
+        }
+
+        // --- Button actions ---
+        function bindCardEvents(card, request) {
+            card.addEventListener('click', function (e) {
+                const action = e.target.dataset.action;
+                if (!action) return;
+
+                const req = findRequest(request.id);
+                if (!req) return;
+
+                switch (action) {
+                    case 'send-parents':
+                        handleSendToParents(req);
+                        break;
+                    case 'stage1-reject':
+                        handleStage1Reject(req);
+                        break;
+                    case 'simulate-parent':
+                        handleParentApproved(req);
+                        break;
+                    case 'final-accept':
+                        handleFinalAccept(req);
+                        break;
+                    case 'final-reject':
+                        handleFinalReject(req);
+                        break;
+                }
+
+                renderRequests();
+            });
+        }
+
+        async function handleSendToParents(request) {
+    try {
+        const response = await fetch(
+            `/api/leaves/${request.id}/send-parent-mail`,
+            {
+                method: 'POST'
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('Failed to send parent mail');
+        }
+
+        alert('Parent email sent successfully!');
+
+    } catch (error) {
+        console.error('Parent mail error:', error);
+        alert('Failed to send parent email.');
+    }
+}
+
+        function handleStage1Reject(request) {
+            // TODO: PUT /api/leaves/{id}/parent-response?status=REJECTED or role-specific reject
+            fetch('/api/leaves/' + request.id + '/parent-response?status=REJECTED', {
+        method: 'PUT'
+    })
+    .then(function(response) {
+        if (response.ok) {
+            alert('Request Successfully Rejected at Stage 1 brother!');
+            location.reload();
+        } else {
+            alert('Database rejection update failed!');
+        }
+    })
+    .catch(function(error) {
+        console.error('Error occurred:', error);
+    });
+        }
+
+        function handleParentApproved(request) {
+            // Simulates parent clicking approve link from email
+            // TODO: Poll or receive webhook from PUT /api/leaves/{id}/parent-response?status=APPROVED
+            fetch('/api/leaves/' + request.id + '/parent-response?status=APPROVED', {
+        method: 'PUT'
+    })
+    .then(function(response) {
+        if (response.ok) {
+            alert('Parents Accepted notification template simulated successful!');
+            location.reload();
+        } else {
+            alert('Parent simulation target logic sync error!');
+        }
+    })
+    .catch(function(error) {
+        console.error('Error occurred:', error);
+    });
+        }
+
+        function handleFinalAccept(request) {
+
+var endpoint = '/api/leaves/' + request.id + '/hod-approval?status=APPROVED';
+
+if (currentRole === 'WARDEN') {
+    endpoint = '/api/leaves/' + request.id + '/warden-approval?status=APPROVED';
+}
+
+fetch(endpoint, {
+    method: 'PUT'
+})
+.then(function(response) {
+
+    if (response.ok) {
+
+        requests = requests.filter(function(r) {
+            return r.id !== request.id;
+        });
+
+        renderRequests();
+
+        alert('Permission GRANTED!');
+
+    } else {
+        alert('Database update sync error at final stage!');
+    }
+
+})
+.catch(function(error) {
+    console.error('Error occurred:', error);
+    alert('Something went wrong!');
+});
+}
+        function handleFinalReject(request) {
+            // TODO: PUT /api/leaves/{id}/hod-approval or warden-approval?status=REJECTED
+            var endpoint = '/api/leaves/' + request.id + '/hod-approval?status=REJECTED';
+    if (currentRole === 'WARDEN') {
+        endpoint = '/api/leaves/' + request.id + '/warden-approval?status=REJECTED';
+    }
+
+    fetch(endpoint, {
+        method: 'PUT'
+    })
+    .then(function(response) {
+        if (response.ok) {
+            alert('Request Successfully Rejected and Mail status triggered brother!');
+            location.reload();
+        } else {
+            alert('Database update sync error at final stage rejection!');
+        }
+    })
+    .catch(function(error) {
+        console.error('Error occurred:', error);
+    });
+        }
+        
+ // --- Init ---
+        visibilityNote.innerHTML = getVisibilityNote(currentRole);
+        renderRequests();
+    })();
+    
+
+</script>
+
+</body>
+</html>

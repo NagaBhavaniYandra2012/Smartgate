@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartGate | Student Dashboard</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --sg-primary: #2563eb;
+            --sg-primary-dark: #1d4ed8;
+            --sg-accent: #0ea5e9;
+            --sg-dark: #0f172a;
+            --sg-muted: #64748b;
+            --sg-surface: #f8fafc;
+            --sg-card: #ffffff;
+            --sg-border: #e2e8f0;
+            --sg-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+            --sg-radius: 16px;
+            --sg-success: #059669;
+            --sg-warning: #d97706;
+        }
+
+        body {
+            font-family: "DM Sans", system-ui, sans-serif;
+            background: linear-gradient(180deg, #eef4ff 0%, var(--sg-surface) 40%, #fff 100%);
+            color: var(--sg-dark);
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--sg-border);
+            padding: 0.85rem 0;
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--sg-dark);
+            text-decoration: none;
+        }
+
+        .brand span { color: var(--sg-primary); }
+
+        /* Profile banner */
+        .profile-banner {
+            background: linear-gradient(135deg, var(--sg-primary) 0%, var(--sg-accent) 100%);
+            color: #fff;
+            border-radius: var(--sg-radius);
+            padding: 1.75rem 2rem;
+            margin-top: 1.5rem;
+            box-shadow: var(--sg-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-banner::after {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+        }
+
+        .profile-banner.empty {
+            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+        }
+
+        .profile-summary-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            opacity: 0.85;
+            margin-bottom: 0.15rem;
+        }
+
+        .profile-summary-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .profile-link {
+            color: #fff;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            cursor: pointer;
+        }
+
+        .profile-link:hover { color: #e0f2fe; }
+
+        .profile-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-banner {
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 0.45rem 1rem;
+            transition: background 0.2s ease;
+        }
+
+        .btn-banner:hover {
+            background: rgba(255, 255, 255, 0.28);
+            color: #fff;
+        }
+
+        /* Section cards */
+        .section-card {
+            background: var(--sg-card);
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius);
+            padding: 1.5rem 1.75rem;
+            margin-top: 1.25rem;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* Attendance mode */
+        .mode-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem 1.15rem;
+            border: 2px solid var(--sg-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            flex: 1;
+        }
+
+        .mode-option:hover {
+            border-color: #cbd5e1;
+            background: var(--sg-surface);
+        }
+
+        .mode-option.selected-working {
+            border-color: var(--sg-primary);
+            background: rgba(37, 99, 235, 0.06);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .mode-option.selected-holiday {
+            border-color: var(--sg-warning);
+            background: rgba(217, 119, 6, 0.06);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
+        }
+
+        .mode-option input {
+            margin-top: 0.2rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+
+        .mode-label {
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+
+        .mode-desc {
+            font-size: 0.875rem;
+            color: var(--sg-muted);
+            margin: 0;
+        }
+
+        .approval-feedback {
+            margin-top: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: none;
+        }
+
+        .approval-feedback.show { display: block; }
+
+        .approval-feedback.working {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--sg-primary-dark);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .approval-feedback.holiday {
+            background: rgba(217, 119, 6, 0.1);
+            color: #b45309;
+            border: 1px solid rgba(217, 119, 6, 0.25);
+        }
+
+        /* Reason form link & container */
+        .form-trigger-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--sg-primary);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .form-trigger-link:hover { color: var(--sg-primary-dark); }
+
+        .reason-form-container {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.35s ease, margin 0.35s ease, padding 0.35s ease;
+            border: 1px solid transparent;
+            border-radius: var(--sg-radius);
+            background: var(--sg-surface);
+        }
+
+        .reason-form-container.show {
+            max-height: 2000px;
+            opacity: 1;
+            margin-top: 1.25rem;
+            padding: 1.5rem;
+            border-color: var(--sg-border);
+        }
+
+        .form-block-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--sg-muted);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--sg-border);
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border-color: var(--sg-border);
+        }
+
+        .form-control:focus {
+            border-color: var(--sg-primary);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+        }
+
+        .outing-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1rem;
+            border: 1px solid var(--sg-border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .outing-option.selected {
+            border-color: var(--sg-primary);
+            background: rgba(37, 99, 235, 0.06);
+        }
+
+        .btn-request {
+            background: var(--sg-primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+        .btn-request:hover {
+            background: var(--sg-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        /* Modals */
+        .modal-content {
+            border: none;
+            border-radius: var(--sg-radius);
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--sg-border);
+        }
+
+        .modal-title { font-weight: 700; }
+
+        .profile-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.85rem 1rem;
+        }
+
+        @media (max-width: 576px) {
+            .profile-form-grid { grid-template-columns: 1fr; }
+        }
+
+        .profile-form-grid .full-width { grid-column: 1 / -1; }
+
+        .photo-upload-area {
+            border: 2px dashed var(--sg-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .photo-upload-area:hover {
+            border-color: var(--sg-primary);
+            background: rgba(37, 99, 235, 0.04);
+        }
+
+        .photo-preview {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--sg-border);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid var(--sg-border);
+        }
+
+        .detail-row:last-child { border-bottom: none; }
+
+        .detail-label {
+            color: var(--sg-muted);
+            font-weight: 500;
+        }
+
+        .detail-value { font-weight: 600; }
+
+        .view-photo-lg {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--sg-border);
+        }
+
+        .hidden-until-profile { display: none; }
+        .hidden-until-profile.visible { display: block; }
+    </style>
+</head>
+<body>
+
+<!-- Top nav -->
+<header class="top-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="brand" href="index.html">Smart<span>Gate</span></a>
+        <span class="text-muted small fw-semibold">Student Dashboard</span>
+    </div>
+</header>
+
+<main class="container pb-5">
+
+    <!-- 1. Profile Header Banner -->
+    <section id="profileBanner" class="profile-banner empty">
+        <div id="profileEmptyState">
+            <p class="mb-2 fw-semibold">No profile created yet</p>
+            <p class="mb-0 small opacity-75">Create your student profile to start submitting leave requests.</p>
+        </div>
+
+        <div id="profileSummaryState" class="hidden-until-profile">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3 col-6">
+                    <div class="profile-summary-label">Student Name</div>
+                    <div class="profile-summary-value" id="bannerName">—</div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="profile-summary-label">Registration Number</div>
+                    <div class="profile-summary-value" id="bannerRegNo">—</div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="profile-summary-label">Branch</div>
+                    <div class="profile-summary-value" id="bannerBranch">—</div>
+                </div>
+                <div class="col-md-3 col-6 text-md-end">
+                    <a class="profile-link" id="viewProfileLink">View Student Profile</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <button type="button" class="btn btn-banner" id="createProfileBtn">Create Student Profile</button>
+            <button type="button" class="btn btn-banner hidden-until-profile" id="editProfileBtn">Edit</button>
+        </div>
+    </section>
+
+    <!-- 2. Attendance Mode Selectors -->
+    <section class="section-card">
+        <h2 class="section-title">Attendance Mode</h2>
+        <div class="d-flex flex-column flex-md-row gap-3">
+            <label class="mode-option" id="workingDayOption">
+                <input type="checkbox" id="workingDayCheck" name="attendanceMode">
+                <div>
+                    <div class="mode-label">Working Day</div>
+                    <p class="mode-desc">Requires both HOD and Warden approval</p>
+                </div>
+            </label>
+            <label class="mode-option" id="holidayOption">
+                <input type="checkbox" id="holidayCheck" name="attendanceMode">
+                <div>
+                    <div class="mode-label">Holiday</div>
+                    <p class="mode-desc">Only Warden approval is required</p>
+                </div>
+            </label>
+        </div>
+
+        <div id="workingDayFeedback" class="approval-feedback working">
+            Both <strong>HOD</strong> and <strong>Warden</strong> approvals are required for working-day leave requests.
+        </div>
+        <div id="holidayFeedback" class="approval-feedback holiday">
+            Only <strong>Warden</strong> approval is required — HOD approval is not needed on holidays.
+        </div>
+    </section>
+
+    <!-- 3. Reason Request Form -->
+    <section class="section-card">
+        <a class="form-trigger-link" id="reasonFormLink">
+            &#128221; Reason Request Form
+        </a>
+
+        <div id="reasonFormContainer" class="reason-form-container">
+            <form id="leaveRequestForm">
+
+                <!-- Father -->
+                <div class="form-block-title">Father's Details</div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label for="fatherName" class="form-label">Father's Name</label>
+                        <input type="text" class="form-control" id="fatherName" placeholder="Full name">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="fatherPhone" class="form-label">Father's Phone</label>
+                        <input type="tel" class="form-control" id="fatherPhone" placeholder="Phone number">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="fatherEmail" class="form-label">Father's Email</label>
+                        <input type="email" class="form-control" id="fatherEmail" placeholder="Email address">
+                    </div>
+                </div>
+
+                <!-- Mother -->
+                <div class="form-block-title">Mother's Details</div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label for="motherName" class="form-label">Mother's Name</label>
+                        <input type="text" class="form-control" id="motherName" placeholder="Full name">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="motherPhone" class="form-label">Mother's Phone</label>
+                        <input type="tel" class="form-control" id="motherPhone" placeholder="Phone number">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="motherEmail" class="form-label">Mother's Email</label>
+                        <input type="email" class="form-control" id="motherEmail" placeholder="Email address">
+                    </div>
+                </div>
+
+                <!-- Guardian -->
+                <div class="form-block-title">Guardian's Details</div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label for="guardianName" class="form-label">Guardian's Name</label>
+                        <input type="text" class="form-control" id="guardianName" placeholder="Full name">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="guardianPhone" class="form-label">Guardian's Phone</label>
+                        <input type="tel" class="form-control" id="guardianPhone" placeholder="Phone number">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="guardianEmail" class="form-label">Guardian's Email</label>
+                        <input type="email" class="form-control" id="guardianEmail" placeholder="Email address">
+                    </div>
+                </div>
+
+                <!-- Outing Type -->
+                <div class="form-block-title">Outing Type</div>
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                    <label class="outing-option" id="homeOutingOption">
+                        <input type="checkbox" id="homeOutingCheck" name="outingType">
+                        Home Outing
+                    </label>
+                    <label class="outing-option" id="localOutingOption">
+                        <input type="checkbox" id="localOutingCheck" name="outingType">
+                        Local Outing
+                    </label>
+                </div>
+
+                <!-- Reason & Dates -->
+                <div class="form-block-title">Leave Details</div>
+                <div class="mb-3">
+                    <label for="reason" class="form-label">Reason</label>
+                    <textarea class="form-control" id="reason" rows="3" placeholder="Describe the reason for your leave request"></textarea>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                </div>
+
+                <!-- 4. Submit -->
+                <div class="text-end">
+                    <button type="submit" class="btn btn-request">Request</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+<!-- Create / Edit Profile Modal -->
+<div class="modal fade" id="profileFormModal" tabindex="-1" aria-labelledby="profileFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileFormModalLabel">Create Student Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <div class="profile-form-grid">
+                        <div>
+                            <label for="profileName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="profileName" required>
+                        </div>
+                        <div>
+                            <label for="profileRegNo" class="form-label">Registration Number</label>
+                            <input type="text" class="form-control" id="profileRegNo" required>
+                        </div>
+                        <div>
+                            <label for="profileBranch" class="form-label">Branch</label>
+                            <input type="text" class="form-control" id="profileBranch" required>
+                        </div>
+                        <div>
+                            <label for="profileYear" class="form-label">Year</label>
+                            <input type="text" class="form-control" id="profileYear" placeholder="e.g. 2nd Year">
+                        </div>
+                        <div>
+                            <label for="profileRoom" class="form-label">Room Number</label>
+                            <input type="text" class="form-control" id="profileRoom">
+                        </div>
+                        <div>
+                            <label for="profileBlock" class="form-label">Block</label>
+                            <input type="text" class="form-control" id="profileBlock">
+                        </div>
+                        <div>
+                            <label for="profilePhone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="profilePhone">
+                        </div>
+                        <div>
+                            <label for="profileEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="profileEmail">
+                        </div>
+                        <div class="full-width">
+                            <label for="profileAddress" class="form-label">Address</label>
+                            <textarea class="form-control" id="profileAddress" rows="2"></textarea>
+                        </div>
+                        <div class="full-width">
+                            <label class="form-label">Photo</label>
+                            <div class="photo-upload-area" id="photoUploadArea">
+                                <img id="photoPreview" class="photo-preview d-none" alt="Student photo preview">
+                                <div id="photoPlaceholder">
+                                    <div class="text-muted small">Click to upload a photo</div>
+                                </div>
+                                <input type="file" id="photoInput" accept="image/*" class="d-none">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-request" id="profileSubmitBtn">Save Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Profile Modal -->
+<div class="modal fade" id="viewProfileModal" tabindex="-1" aria-labelledby="viewProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewProfileModalLabel">Student Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="viewPhoto" class="view-photo-lg mb-3 d-none" alt="Student photo">
+                <div id="viewPhotoPlaceholder" class="view-photo-lg d-inline-flex align-items-center justify-content-center bg-light text-muted mb-3 small">
+                    No Photo
+                </div>
+                <div class="text-start mt-2">
+                    <div class="detail-row"><span class="detail-label">Room Number</span><span class="detail-value" id="viewRoom">—</span></div>
+                    <div class="detail-row"><span class="detail-label">Block</span><span class="detail-value" id="viewBlock">—</span></div>
+                    <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value" id="viewPhone">—</span></div>
+                    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value" id="viewEmail">—</span></div>
+                    <div class="detail-row"><span class="detail-label">Address</span><span class="detail-value" id="viewAddress">—</span></div>
+                    <div class="detail-row"><span class="detail-label">Year</span><span class="detail-value" id="viewYear">—</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+<script>
+    /**
+     * SmartGate Student Dashboard Controller
+     * Manages profile modals, attendance mode toggles, and leave request form visibility.
+     */
+    (function () {
+        'use strict';
+
+        // --- Profile state (in-memory; wire to backend later) ---
+        let studentProfile = null;
+        let photoDataUrl = null;
+
+        // --- DOM: Profile banner ---
+        const profileBanner = document.getElementById('profileBanner');
+        const profileEmptyState = document.getElementById('profileEmptyState');
+        const profileSummaryState = document.getElementById('profileSummaryState');
+        const bannerName = document.getElementById('bannerName');
+        const bannerRegNo = document.getElementById('bannerRegNo');
+        const bannerBranch = document.getElementById('bannerBranch');
+        const createProfileBtn = document.getElementById('createProfileBtn');
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const viewProfileLink = document.getElementById('viewProfileLink');
+
+        // --- DOM: Profile form modal ---
+        const profileFormModalEl = document.getElementById('profileFormModal');
+        const profileFormModalLabel = document.getElementById('profileFormModalLabel');
+        const profileForm = document.getElementById('profileForm');
+        const profileFormModal = new bootstrap.Modal(profileFormModalEl);
+        const viewProfileModal = new bootstrap.Modal(document.getElementById('viewProfileModal'));
+
+        const profileFields = {
+            name: document.getElementById('profileName'),
+            regNo: document.getElementById('profileRegNo'),
+            branch: document.getElementById('profileBranch'),
+            year: document.getElementById('profileYear'),
+            room: document.getElementById('profileRoom'),
+            block: document.getElementById('profileBlock'),
+            phone: document.getElementById('profilePhone'),
+            email: document.getElementById('profileEmail'),
+            address: document.getElementById('profileAddress')
+        };
+
+        const photoInput = document.getElementById('photoInput');
+        const photoUploadArea = document.getElementById('photoUploadArea');
+        const photoPreview = document.getElementById('photoPreview');
+        const photoPlaceholder = document.getElementById('photoPlaceholder');
+
+        // --- DOM: Attendance mode ---
+        const workingDayCheck = document.getElementById('workingDayCheck');
+        const holidayCheck = document.getElementById('holidayCheck');
+        const workingDayOption = document.getElementById('workingDayOption');
+        const holidayOption = document.getElementById('holidayOption');
+        const workingDayFeedback = document.getElementById('workingDayFeedback');
+        const holidayFeedback = document.getElementById('holidayFeedback');
+
+        // --- DOM: Reason form ---
+        const reasonFormLink = document.getElementById('reasonFormLink');
+        const reasonFormContainer = document.getElementById('reasonFormContainer');
+        const leaveRequestForm = document.getElementById('leaveRequestForm');
+        const homeOutingCheck = document.getElementById('homeOutingCheck');
+        const localOutingCheck = document.getElementById('localOutingCheck');
+        const homeOutingOption = document.getElementById('homeOutingOption');
+        const localOutingOption = document.getElementById('localOutingOption');
+
+        // --- Profile helpers ---
+        function updateBanner() {
+            if (!studentProfile) {
+                profileBanner.classList.add('empty');
+                profileEmptyState.style.display = 'block';
+                profileSummaryState.classList.remove('visible');
+                editProfileBtn.classList.remove('visible');
+                createProfileBtn.textContent = 'Create Student Profile';
+                return;
+            }
+
+            profileBanner.classList.remove('empty');
+            profileEmptyState.style.display = 'none';
+            profileSummaryState.classList.add('visible');
+            editProfileBtn.classList.add('visible');
+            createProfileBtn.textContent = 'Create Student Profile';
+
+            bannerName.textContent = studentProfile.name;
+            bannerRegNo.textContent = studentProfile.regNo;
+            bannerBranch.textContent = studentProfile.branch;
+        }
+
+        function populateProfileForm(profile) {
+            profileFields.name.value = profile?.name || '';
+            profileFields.regNo.value = profile?.regNo || '';
+            profileFields.branch.value = profile?.branch || '';
+            profileFields.year.value = profile?.year || '';
+            profileFields.room.value = profile?.room || '';
+            profileFields.block.value = profile?.block || '';
+            profileFields.phone.value = profile?.phone || '';
+            profileFields.email.value = profile?.email || '';
+            profileFields.address.value = profile?.address || '';
+
+            if (photoDataUrl) {
+                photoPreview.src = photoDataUrl;
+                photoPreview.classList.remove('d-none');
+                photoPlaceholder.classList.add('d-none');
+            } else {
+                photoPreview.classList.add('d-none');
+                photoPlaceholder.classList.remove('d-none');
+            }
+        }
+
+        function openProfileFormModal(isEdit) {
+            profileFormModalLabel.textContent = isEdit ? 'Edit Student Profile' : 'Create Student Profile';
+            populateProfileForm(isEdit ? studentProfile : null);
+            profileFormModal.show();
+        }
+
+        function openViewProfileModal() {
+            if (!studentProfile) return;
+
+            document.getElementById('viewRoom').textContent = studentProfile.room || '—';
+            document.getElementById('viewBlock').textContent = studentProfile.block || '—';
+            document.getElementById('viewPhone').textContent = studentProfile.phone || '—';
+            document.getElementById('viewEmail').textContent = studentProfile.email || '—';
+            document.getElementById('viewAddress').textContent = studentProfile.address || '—';
+            document.getElementById('viewYear').textContent = studentProfile.year || '—';
+
+            const viewPhoto = document.getElementById('viewPhoto');
+            const viewPhotoPlaceholder = document.getElementById('viewPhotoPlaceholder');
+
+            if (photoDataUrl) {
+                viewPhoto.src = photoDataUrl;
+                viewPhoto.classList.remove('d-none');
+                viewPhotoPlaceholder.classList.add('d-none');
+            } else {
+                viewPhoto.classList.add('d-none');
+                viewPhotoPlaceholder.classList.remove('d-none');
+            }
+
+            viewProfileModal.show();
+        }
+
+        createProfileBtn.addEventListener('click', function () {
+            openProfileFormModal(!!studentProfile);
+        });
+
+        editProfileBtn.addEventListener('click', function () {
+            openProfileFormModal(true);
+        });
+
+        viewProfileLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            openViewProfileModal();
+        });
+
+        photoUploadArea.addEventListener('click', function () {
+            photoInput.click();
+        });
+
+        photoInput.addEventListener('change', function () {
+            const file = photoInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                photoDataUrl = ev.target.result;
+                photoPreview.src = photoDataUrl;
+                photoPreview.classList.remove('d-none');
+                photoPlaceholder.classList.add('d-none');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        profileForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const userId = localStorage.getItem('userId');
+
+    if (!userId || !/^\d+$/.test(userId)) {
+        alert('User login ID not found. Please login again.');
+        return;
+    }
+
+    const profile = {
+        name: profileFields.name.value.trim(),
+        roleNumber: profileFields.regNo.value.trim(),
+        department: profileFields.branch.value.trim(),
+        hostelBlock: profileFields.block.value.trim(),
+        roomNumber: profileFields.room.value.trim(),
+        phoneNumber: profileFields.phone.value.trim(),
+        email: profileFields.email.value.trim()
+    };
+
+    try {
+        
+        const response = await fetch(`/api/users/${userId}/profile`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(profile)
+        });
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        studentProfile = {
+            name: profile.name,
+            regNo: profile.roleNumber,
+            branch: profile.department,
+            year: profileFields.year.value.trim(),
+            room: profile.roomNumber,
+            block: profile.hostelBlock,
+            phone: profile.phoneNumber,
+            email: profile.email,
+            address: profileFields.address.value.trim()
+        };
+
+        updateBanner();
+        profileFormModal.hide();
+
+        alert('Profile saved successfully!');
+
+    } catch (error) {
+        console.error('Profile save error:', error);
+        alert('Profile could not be saved.');
+    }
+});
+
+        // --- Attendance mode (mutually exclusive) ---
+        function clearModeSelection() {
+            workingDayOption.classList.remove('selected-working');
+            holidayOption.classList.remove('selected-holiday');
+            workingDayFeedback.classList.remove('show');
+            holidayFeedback.classList.remove('show');
+        }
+
+        workingDayCheck.addEventListener('change', function () {
+            if (workingDayCheck.checked) {
+                holidayCheck.checked = false;
+                clearModeSelection();
+                workingDayOption.classList.add('selected-working');
+                workingDayFeedback.classList.add('show');
+            } else {
+                workingDayOption.classList.remove('selected-working');
+                workingDayFeedback.classList.remove('show');
+            }
+        });
+
+        holidayCheck.addEventListener('change', function () {
+            if (holidayCheck.checked) {
+                workingDayCheck.checked = false;
+                clearModeSelection();
+                holidayOption.classList.add('selected-holiday');
+                holidayFeedback.classList.add('show');
+            } else {
+                holidayOption.classList.remove('selected-holiday');
+                holidayFeedback.classList.remove('show');
+            }
+        });
+
+        // --- Reason form toggle ---
+        reasonFormLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            reasonFormContainer.classList.toggle('show');
+        });
+
+        // --- Outing type (mutually exclusive) ---
+        homeOutingCheck.addEventListener('change', function () {
+            if (homeOutingCheck.checked) {
+                localOutingCheck.checked = false;
+                homeOutingOption.classList.add('selected');
+                localOutingOption.classList.remove('selected');
+            } else {
+                homeOutingOption.classList.remove('selected');
+            }
+        });
+
+        localOutingCheck.addEventListener('change', function () {
+            if (localOutingCheck.checked) {
+                homeOutingCheck.checked = false;
+                localOutingOption.classList.add('selected');
+                homeOutingOption.classList.remove('selected');
+            } else {
+                localOutingOption.classList.remove('selected');
+            }
+        });
+
+        // --- Leave request submit ---
+        leaveRequestForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            console.log("WORKING DAY VALUE:", workingDayCheck.checked);
+            const payload = {
+                isWorkingDay: workingDayCheck.checked,
+                isHoliday: holidayCheck.checked,
+                outingType: homeOutingCheck.checked ? 'Home Outing' : localOutingCheck.checked ? 'Local Outing' : null,
+                fatherName: document.getElementById('fatherName').value,
+                fatherPhone: document.getElementById('fatherPhone').value,
+                fatherEmail: document.getElementById('fatherEmail').value,
+                motherName: document.getElementById('motherName').value,
+                motherPhone: document.getElementById('motherPhone').value,
+                motherEmail: document.getElementById('motherEmail').value,
+                guardianName: document.getElementById('guardianName').value,
+                guardianPhone: document.getElementById('guardianPhone').value,
+                guardianEmail: document.getElementById('guardianEmail').value,
+                reason: document.getElementById('reason').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                studentProfile: localStorage.getItem('userId'),
+                user:{id:localStorage.getItem('userId') }
+            };
+
+            // TODO: POST to /api/leaves/apply
+            console.log('Leave request payload:', payload);
+        
+        
+        fetch('/api/leaves/apply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => {
+            if (res.ok) {
+                alert('Leave request submitted successfully to Server!');
+                leaveRequestForm.reset();
+                if(typeof homeOutingOption !== 'undefined') homeOutingOption.classList.remove('selected');
+                if(typeof localOutingOption !== 'undefined') localOutingOption.classList.remove('selected');
+                window.location.reload(); // పేజీ రీఫ్రెష్ అయి డేటా స్క్రీన్ పై కనిపించడానికి
+            } else {
+                alert('Server returned an error: ' + res.status);
+            }
+        })
+        .catch(err => {
+            console.error('Network Error:', err);
+            alert('Failed to connect to backend server!');
+        });
+        });
+   
+
+        // --- Init ---
+
+        async function loadStudentProfile() {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId || !/^\d+$/.test(userId)) return;
+
+    try {
+        const response = await fetch(`/api/users/${userId}`);
+
+        if (!response.ok) return;
+
+        const user = await response.json();
+        console.log("PROFILE LOADED FROM DB:", user);
+        studentProfile = {
+            name: user.name || '',
+            regNo: user.roleNumber || '',
+            branch: user.department || '',
+            year: '',
+            room: user.roomNumber || '',
+            block: user.hostelBlock || '',
+            phone: user.phoneNumber || '',
+            email: user.email || '',
+            address: ''
+        };
+
+        updateBanner();
+
+    } catch (error) {
+        console.error('Profile loading error:', error);
+    }
+}
+loadStudentProfile();
+    })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartGate | Hostel Leave Management</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --sg-primary: #2563eb;
+            --sg-primary-dark: #1d4ed8;
+            --sg-accent: #0ea5e9;
+            --sg-dark: #0f172a;
+            --sg-muted: #64748b;
+            --sg-surface: #f8fafc;
+            --sg-card: #ffffff;
+            --sg-border: #e2e8f0;
+            --sg-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+            --sg-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+            background: linear-gradient(180deg, #eef4ff 0%, var(--sg-surface) 38%, #ffffff 100%);
+            color: var(--sg-dark);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--sg-border);
+            padding: 0.85rem 0;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.35rem;
+            letter-spacing: -0.02em;
+            color: var(--sg-dark) !important;
+        }
+
+        .navbar-brand span {
+            color: var(--sg-primary);
+        }
+
+        .nav-link-custom {
+            color: var(--sg-muted) !important;
+            font-weight: 500;
+            padding: 0.5rem 0.85rem !important;
+            border-radius: 999px;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active-info {
+            color: var(--sg-primary) !important;
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        .btn-signup-dark {
+            background: var(--sg-dark);
+            color: #fff !important;
+            border: none;
+            padding: 0.5rem 1.15rem !important;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-signup-dark:hover {
+            background: #1e293b;
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+        }
+
+        .btn-signup-normal {
+            background: transparent;
+            color: var(--sg-muted) !important;
+            border: none;
+            padding: 0.5rem 0.85rem !important;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .btn-signup-normal:hover {
+            color: var(--sg-primary) !important;
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        /* Hero */
+        .hero-section {
+            padding: 5rem 0 3rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--sg-primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-title {
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.125rem;
+            color: var(--sg-muted);
+            max-width: 560px;
+            line-height: 1.7;
+        }
+
+        .hero-card {
+            background: var(--sg-card);
+            border: 1px solid var(--sg-border);
+            border-radius: calc(var(--sg-radius) + 8px);
+            box-shadow: var(--sg-shadow);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.18), transparent 70%);
+            pointer-events: none;
+        }
+
+        .feature-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            background: var(--sg-surface);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--sg-primary);
+            font-size: 1rem;
+        }
+
+        /* Info panels (About / Contact) */
+        .info-panel {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.45s ease, opacity 0.35s ease, margin 0.35s ease, padding 0.35s ease;
+            margin-top: 0;
+            border-radius: var(--sg-radius);
+            background: var(--sg-card);
+            border: 1px solid transparent;
+        }
+
+        .info-panel.show {
+            max-height: 320px;
+            opacity: 1;
+            margin-top: 2rem;
+            padding: 1.75rem 2rem;
+            border-color: var(--sg-border);
+            box-shadow: var(--sg-shadow);
+        }
+
+        .info-panel h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-panel p {
+            color: var(--sg-muted);
+            margin-bottom: 0;
+            line-height: 1.7;
+        }
+
+        /* Modals */
+        .modal-square .modal-dialog {
+            max-width: 420px;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: var(--sg-radius);
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--sg-border);
+            padding: 1.25rem 1.5rem 1rem;
+        }
+
+        .modal-title {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .modal-body {
+            padding: 1.25rem 1.5rem 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--sg-dark);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border-color: var(--sg-border);
+            padding: 0.65rem 0.85rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--sg-primary);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-primary-custom {
+            background: var(--sg-primary);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.7rem 1rem;
+        }
+
+        .btn-primary-custom:hover {
+            background: var(--sg-primary-dark);
+        }
+
+        .btn-google {
+            border: 1px solid var(--sg-border);
+            background: #fff;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.7rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            width: 100%;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn-google:hover {
+            background: var(--sg-surface);
+            border-color: #cbd5e1;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--sg-muted);
+            font-size: 0.85rem;
+            margin: 1rem 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--sg-border);
+        }
+
+        footer {
+            margin-top: 4rem;
+            padding: 1.5rem 0;
+            text-align: center;
+            color: var(--sg-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--sg-border);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">Smart<span>Gate</span></a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="mainNavbar">
+            <ul class="navbar-nav align-items-lg-center gap-lg-1">
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="#" id="loginNavLink">Log In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-signup-dark" href="#" id="signupNavLink">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="#" id="aboutNavLink">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="#" id="contactNavLink">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<main class="container hero-section">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <div class="hero-badge">Hostel Leave Management System</div>
+            <h1 class="hero-title">Streamline leave approvals with SmartGate</h1>
+            <p class="hero-subtitle">
+                A modern platform for students, parents, HODs, and wardens to manage hostel leave requests —
+                from application to gate verification — in one seamless workflow.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <div class="hero-card">
+                <div class="feature-pill">
+                    <div class="feature-icon">&#9993;</div>
+                    <span>Automated parent approval emails</span>
+                </div>
+                <div class="feature-pill">
+                    <div class="feature-icon">&#10003;</div>
+                    <span>Role-based HOD &amp; Warden workflows</span>
+                </div>
+                <div class="feature-pill">
+                    <div class="feature-icon">&#128274;</div>
+                    <span>Watchman verification at the gate</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Us info panel -->
+    <section id="aboutPanel" class="info-panel" aria-live="polite">
+        <h3>About Us</h3>
+        <p>
+            SmartGate is designed for college hostels to simplify leave management. Students apply online,
+            parents approve via email links, and HODs and wardens review requests based on working-day rules.
+            The system keeps everyone informed and ensures secure gate exit verification.
+        </p>
+    </section>
+
+    <!-- Contact info panel -->
+    <section id="contactPanel" class="info-panel" aria-live="polite">
+        <h3>Contact</h3>
+        <p>
+            For support or demo access, reach us at
+            <strong>support@smartgate.edu</strong> or call <strong>+91 98765 43210</strong>.
+            Office hours: Monday–Friday, 9:00 AM – 5:00 PM IST. We typically respond within one business day.
+        </p>
+    </section>
+</main>
+
+<footer>
+    &copy; 2026 SmartGate. All rights reserved.
+</footer>
+
+<!-- Sign Up Modal -->
+<div class="modal fade modal-square" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title" id="signupModalLabel">Create Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="mb-3">
+                <label for="signupRole" class="form-label">Select your role</label>
+                <select id="signupRole" class="form-select" required>
+                    <option value="" disabled selected>Choose your role...</option>
+                    <option value="STUDENT">Student</option>
+                    <option value="HOD">HOD</option>
+                    <option value="WARDEN">Warden</option>
+                </select>
+            </div>
+            <div class="modal-body">
+                <form id="signupForm">
+                    
+                    <div class="mb-3">
+                        <label for="signupName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="signupName" placeholder="Full name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signupRegNo" class="form-label">Reg No</label>
+                        <input type="text" class="form-control" id="signupRegNo" placeholder="Registration number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signupMail" class="form-label">Mail</label>
+                        <input type="email" class="form-control" id="signupMail" placeholder="Email address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signupPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="signupPassword" placeholder="Create password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-primary-custom w-100">Sign Up</button>
+                </form>
+
+                <div class="divider">or</div>
+
+                <button type="button" class="btn btn-google" id="googleSignupBtn">
+                    <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+                        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.876 32.657 29.303 36 24 36c-5.657 0-10.343-3.657-12.303-8.667H8.556v6.667C12.963 39.657 18.14 42 24 42c12.426 0 22.5-10.074 22.5-22.5S36.426 3 24 3 1.5 13.074 1.5 25.5c0 1.657.18 3.273.514 4.833L43.611 20.083z"/>
+                        <path fill="#FF3D00" d="M6.306 14.691l5.657 4.147C13.963 15.657 18.64 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C33.891 6.053 29.14 4 24 4 12.963 4 3.516 12.047 2.014 23.306l4.292 6.385z"/>
+                        <path fill="#4CAF50" d="M24 44c5.657 0 10.343-1.657 14.304-4.533l-6.614-5.433C29.303 36 24.726 36 24 36c-5.303 0-9.876-3.343-11.303-7.933l-5.657 4.373C8.963 40.343 15.657 44 24 44z"/>
+                        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-1.014 2.933-3.303 5.333-6.303 6.667l6.614 5.433C39.657 36.657 44 31.657 44 25.5 44 23.657 43.833 21.833 43.611 20.083z"/>
+                    </svg>
+                    Continue with Google
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log In Modal -->
+<div class="modal fade modal-square" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Log In</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="loginRole" class="form-label">Role</label>
+                        <select class="form-select" id="loginRole" required>
+                            <option value="" selected disabled>Select role</option>
+                            <option value="STUDENT">Student</option>
+                            <option value="HOD">HOD</option>
+                            <option value="WARDEN">Warden</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="loginName" placeholder="Full name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginRegNo" class="form-label">Reg No</label>
+                        <input type="text" class="form-control" id="loginRegNo" placeholder="Registration number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginDept" class="form-label">Dept</label>
+                        <input type="text" class="form-control" id="loginDept" placeholder="Department" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="loginEmail" placeholder="Email address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginPhone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="loginPhone" placeholder="Phone number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-primary-custom w-100">Log In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+<script>
+    /**
+     * SmartGate Landing Page Controller
+     * Handles modal states, navbar sign-up button styling, and info panel toggles.
+     */
+    (function () {
+        'use strict';
+
+        // --- State ---
+        let isSignedUp = false;
+
+        // --- DOM References ---
+        const signupNavLink = document.getElementById('signupNavLink');
+        const loginNavLink = document.getElementById('loginNavLink');
+        const aboutNavLink = document.getElementById('aboutNavLink');
+        const contactNavLink = document.getElementById('contactNavLink');
+
+        const signupModalEl = document.getElementById('signupModal');
+        const loginModalEl = document.getElementById('loginModal');
+        const signupForm = document.getElementById('signupForm');
+        const loginForm = document.getElementById('loginForm');
+        const googleSignupBtn = document.getElementById('googleSignupBtn');
+
+        const aboutPanel = document.getElementById('aboutPanel');
+        const contactPanel = document.getElementById('contactPanel');
+
+        const signupModal = new bootstrap.Modal(signupModalEl);
+        const loginModal = new bootstrap.Modal(loginModalEl);
+
+        // --- Sign Up Button State ---
+        function updateSignupButtonState() {
+            if (isSignedUp) {
+                signupNavLink.classList.remove('btn-signup-dark');
+                signupNavLink.classList.add('btn-signup-normal', 'nav-link-custom');
+            } else {
+                signupNavLink.classList.add('btn-signup-dark');
+                signupNavLink.classList.remove('btn-signup-normal', 'nav-link-custom');
+            }
+        }
+
+        // --- Info Panels (About / Contact) ---
+        function hideAllInfoPanels() {
+            aboutPanel.classList.remove('show');
+            contactPanel.classList.remove('show');
+            aboutNavLink.classList.remove('active-info');
+            contactNavLink.classList.remove('active-info');
+        }
+
+        function toggleInfoPanel(panel, navLink) {
+            const isOpen = panel.classList.contains('show');
+            hideAllInfoPanels();
+            if (!isOpen) {
+                panel.classList.add('show');
+                navLink.classList.add('active-info');
+                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // --- Modal Openers ---
+        signupNavLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            hideAllInfoPanels();
+            signupModal.show();
+        });
+
+        loginNavLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            hideAllInfoPanels();
+            loginModal.show();
+        });
+
+        aboutNavLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            toggleInfoPanel(aboutPanel, aboutNavLink);
+        });
+
+        contactNavLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            toggleInfoPanel(contactPanel, contactNavLink);
+        });
+
+ // --- Sign Up Submit: Connect to Backend Database ---
+if (signupForm) {
+    signupForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const roleNumberValue = document.getElementById('signupRegNo').value;
+        const emailValue = document.getElementById('signupMail').value;
+        const passwordValue = document.getElementById('signupPassword').value;
+        const roleValue = document.getElementById('signupRole').value;
+        fetch('/api/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                roleNumber: roleNumberValue,
+                email: emailValue,
+                password: passwordValue,
+                role: roleValue
+            })
+        })
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(text);
+                });
+            }
+            return res.json();
+        })
+        .then(data => {
+            alert('Registration Successful! Please Log In.');
+            isSignedUp = true;
+            updateSignupButtonState();
+            signupForm.reset();
+            signupModal.hide();
+        })
+        .catch(err => {
+            alert('Registration Failed: ' + err.message);
+        });
+    });
+}
+        googleSignupBtn.addEventListener('click', function () {
+            // TODO: Wire to Google OAuth flow
+            isSignedUp = true;
+            updateSignupButtonState();
+            signupForm.reset();
+            signupModal.hide();
+        });
+
+// --- Log In Submit: Connect to Backend Database ---
+if (loginForm) {
+    loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const usernameValue = document.getElementById('loginRegNo').value;
+        const passwordValue = document.getElementById('loginPassword').value;
+
+        fetch('/api/users/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        username: usernameValue,
+        password: passwordValue
+    })
+})
+.then(async res => {
+    if (!res.ok) {
+        const message = await res.text();
+        throw new Error(message);
+    }
+    return res.json();
+})
+.then(user => {
+
+    let userRole = user.role || 'STUDENT';
+
+    localStorage.setItem('userRole', userRole);
+    localStorage.setItem('userId', user.id);
+    localStorage.setItem('userRoleNumber', user.roleNumber);
+
+    alert('Login Successful!');
+
+    if (userRole === 'HOD' || userRole === 'WARDEN') {
+        window.location.href = '/approval.html';
+    } else {
+        window.location.href = '/dashboard.html';
+    }
+})
+.catch(err => {
+    alert('Login Failed: ' + err.message);
+});
+        
+    });
+
+}
+
+        // --- Initialize ---
+        updateSignupButtonState();
+    })();
+</script>
+
+</body>
+</html>
